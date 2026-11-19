@@ -6,7 +6,7 @@
 </style>
 <header><nav class="wrap"><span class="mark" aria-hidden="true">▦</span> ЭКТ <span class="navsub">Карта аудитории</span></nav></header>
 <main class="wrap"><div class="intro"><div><h1>Тепловая карта вызовов</h1><p>Нажмите на место, когда преподаватель вызовет студента.</p></div><div class="switch" aria-label="Режим карты"><button id="mine" aria-pressed="true">Моя карта</button><button id="example" aria-pressed="false">Пример</button></div></div>
-<div class="layout"><section class="panel"><div class="maphead"><h2>План аудитории</h2><span class="small">Окна справа</span></div><div class="floor"><div class="board">ДОСКА</div><div class="row"><div class="teacher">Стол преподавателя</div></div><div id="rows"></div></div><div class="legend">Реже <span class="scale" id="scale"></span> Чаще</div></section>
+<div class="layout"><section class="panel"><div class="maphead"><h2>План аудитории</h2><span class="small">Окна справа</span></div><div class="floor"><div class="board">ДОСКА</div><div id="rows"></div></div><div class="legend">Реже <span class="scale" id="scale"></span> Чаще</div></section>
 <aside class="side"><section class="panel"><h2>Статистика</h2><div class="metric"><strong id="total" class="big">0</strong><span class="small">вызовов всего</span></div><div id="peak" class="peak"></div></section><section class="panel"><div class="sectionhead"><h2>Последние вызовы</h2><button id="undo" class="undo">Отменить</button></div><ul class="history" id="history"></ul><p class="small empty" id="empty">Здесь появится первая отметка.</p></section><p class="note" id="note"></p></aside></div><div class="live" role="status" id="status"></div></main>
 <script>
 'use strict';
@@ -28,13 +28,18 @@ const seats=[];
 for(let r=0;r<8;r++){
   const row=document.createElement('div');row.className='row';
   const label=document.createElement('span');label.className='rowlabel';label.textContent=r+1;row.append(label);
-  const deskCount=r===7?1:2;
+  const deskCount=r===0?1:2;
   for(let d=0;d<deskCount;d++){
     const desk=document.createElement('div');desk.className='desk';row.append(desk);
     for(let j=0;j<3;j++){
-      const s=r*6+d*3+j, button=document.createElement('button');button.className='seat';button.textContent=seatName(s);
-      button.onclick=()=>change(s);desk.append(button);seats.push(button);
+      const deskRow=d===0?r:r-1;
+      const s=deskRow*6+d*3+j, button=document.createElement('button');button.className='seat';button.textContent=seatName(s);
+      button.onclick=()=>change(s);desk.append(button);seats[s]=button;
     }
+  }
+  if(r===0){
+    const teacher=document.createElement('div');teacher.className='teacher';
+    teacher.textContent='Стол преподавателя';row.append(teacher);
   }
   el('rows').append(row);
 }
